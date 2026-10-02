@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { Insurance } from './insurance.entity';
 import { InsuranceService } from './insurance.service';
+import { UpdateInsuranceDto } from './dto/updateInsurance.dto';
+import { CreateInsuranceDto } from './dto/createInsurance.dto';
 
 @Controller('insurance')
 export class InsuranceController {
@@ -20,23 +22,23 @@ export class InsuranceController {
     return this.insuranceService.findAll(provider);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<Insurance> {
-    return this.insuranceService.findOne(id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string): Promise<Insurance> {
+  //   return this.insuranceService.findOne(id);
+  // }
 
-  @Post()
-  create(@Body() dto: CreateInsuranceDto): Promise<Insurance> {
-    return this.insuranceService.create(dto);
-  }
+  // @Post()
+  // create(@Body() dto: CreateInsuranceDto): Promise<Insurance> {
+  //   return this.insuranceService.create(dto);
+  // }
 
-  @Patch('id')
-  update(
-    @Body() dto: UpdateInsuranceDto,
-    @Param('id') id: string,
-  ): Promise<Insurance> {
-    return this.insuranceService.update(dto);
-  }
+  // @Patch('id')
+  // update(
+  //   @Body() dto: UpdateInsuranceDto,
+  //   @Param('id') id: string,
+  // ): Promise<Insurance> {
+  //   return this.insuranceService.update(dto);
+  // }
 
   @Delete(':id')
   remove(@Param('id') id: string): Promise<void> {

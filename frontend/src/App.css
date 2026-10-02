@@ -9,6 +9,17 @@ h1 {
   font-size: 1.5rem;
 }
 
+.nav {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.nav button[aria-current='page'] {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
 section {
   margin-bottom: 2rem;
 }
