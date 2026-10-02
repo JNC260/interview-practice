@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Brackets, ILike, Any, ArrayContains } from 'typeorm';
 import { Patient } from './patient.entity.js';
 import { CreatePatientDto } from './dto/create-patient.dto.js';
 
@@ -11,7 +11,15 @@ export class PatientsService {
     private readonly patientsRepository: Repository<Patient>,
   ) {}
 
-  findAll(): Promise<Patient[]> {
+  findAll(searchTerm?: string): Promise<Patient[]> {
+    if (searchTerm) {
+      return this.patientsRepository.find({
+        where: [
+          { fullName: ILike(`%${searchTerm}%`) },
+          { conditions: ILike(`%${searchTerm}%`) },
+        ],
+      });
+    }
     return this.patientsRepository.find();
   }
 

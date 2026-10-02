@@ -5,6 +5,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { PatientsService } from './patients.service.js';
 import { Patient } from './patient.entity.js';
@@ -15,8 +16,8 @@ export class PatientsController {
   constructor(private readonly patientsService: PatientsService) {}
 
   @Get()
-  findAll(): Promise<Patient[]> {
-    return this.patientsService.findAll();
+  findAll(@Query('searchTerm') searchTerm?: string): Promise<Patient[]> {
+    return this.patientsService.findAll(searchTerm);
   }
 
   @Get(':id')
