@@ -1,0 +1,48 @@
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  text-align: left;
+}
+
+h1 {
+  font-size: 1.5rem;
+}
+
+section {
+  margin-bottom: 2rem;
+}
+
+.appointment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 360px;
+}
+
+.appointment-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid #333;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+.status {
+  text-align: center;
+  margin-top: 3rem;
+}
