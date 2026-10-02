@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
 import { Patient } from './patient.entity';
 import { CreatePatientDto } from './dto/create-patient.dto';
+import { ILike } from 'typeorm';
 
 @Injectable()
 export class PatientsService {
@@ -11,7 +12,25 @@ export class PatientsService {
     private readonly patientsRepository: Repository<Patient>,
   ) {}
 
-  findAll(): Promise<Patient[]> {
+  findAll(searchTerm?: string): Promise<Patient[]> {
+    if (searchTerm) {
+      const results = this.patientsRepository
+        .createQueryBuilder('patient')
+        .where(
+          new Brackets((qb) => {
+            qb.where("LOWER(patient.fullName) LIKE :term ESCAPE '\\'", {
+              searchTerm,
+            }).orWhere(
+              "LOWER(patient.conditions) LIKE :searchTerm ESCAPE '\\'",
+              {
+                searchTerm,
+              },
+            );
+          }),
+        )
+        .getMany();
+      return results;
+    }
     return this.patientsRepository.find();
   }
 
