@@ -12,7 +12,6 @@ export const PatientTablePage = () => {
   const debouncedSearch = useDebouncedCallback(
     // function
     (searchTerm: string) => {
-      console.log("TERM", searchTerm);
       setSearchTerm(searchTerm);
     },
     // delay in ms

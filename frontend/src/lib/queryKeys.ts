@@ -1,15 +1,26 @@
-// Keys are hierarchical, so invalidating `all` also covers every list and
-// detail query for that resource.
-function resourceKeys<const R extends string>(resource: R) {
-  return {
-    all: [resource] as const,
-    list: (searchTerm?: string) => [resource, "list", searchTerm] as const,
-    detail: (id: string) => [resource, "detail", id] as const,
-  };
-}
-
 export const queryKeys = {
-  patients: resourceKeys("patients"),
-  advocates: resourceKeys("advocates"),
-  appointments: resourceKeys("appointments"),
+  patients: {
+    all: ["patients"] as const,
+    list: (searchTerm?: string) => ["patients", "list", searchTerm] as const,
+    detail: (id: string) => ["patients", "detail", id] as const,
+  },
+  advocates: {
+    all: ["advocates"] as const,
+    list: () => ["advocates", "list"] as const,
+    detail: (id: string) => ["advocates", "detail", id] as const,
+  },
+  appointments: {
+    all: ["appointments"] as const,
+    list: () => ["appointments", "list"] as const,
+    byAdvocate: ({
+      advocateId,
+      sortBy,
+      sortDir,
+    }: {
+      advocateId: string;
+      sortBy: string;
+      sortDir: string;
+    }) => ["appointments", "list", advocateId, sortBy, sortDir],
+    detail: (id: string) => ["appointments", "detail", id] as const,
+  },
 };

@@ -29,6 +29,29 @@ export function useAppointments() {
   });
 }
 
+export function useAppointmentsByAdvocate({
+  advocateId,
+  sortBy = "scheduledAt",
+  sortDir = "DESC",
+  enabled = false,
+}: {
+  advocateId: string;
+  sortBy?: string;
+  sortDir?: string;
+  enabled: boolean;
+}) {
+  return useQuery({
+    enabled,
+    queryKey: queryKeys.appointments.byAdvocate({
+      advocateId,
+      sortBy,
+      sortDir,
+    }),
+    queryFn: () =>
+      api.listAppointmentsByAdvocate({ advocateId, sortBy, sortDir }),
+  });
+}
+
 export function useCreateAppointment() {
   const queryClient = useQueryClient();
   return useMutation({

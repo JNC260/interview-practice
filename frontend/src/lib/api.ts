@@ -111,6 +111,18 @@ export const api = {
     post<Advocate>("/advocates", input),
 
   listAppointments: () => request<AppointmentWithRelations[]>("/appointments"),
+  listAppointmentsByAdvocate: ({
+    advocateId,
+    sortBy,
+    sortDir,
+  }: {
+    advocateId: string;
+    sortBy: string;
+    sortDir: string;
+  }) =>
+    request<AppointmentWithRelations[]>(
+      `/appointments/byAdvocate/${advocateId}?sortBy=${sortBy}&sortDir=${sortDir}`,
+    ),
   getAppointment: (id: string) =>
     request<AppointmentWithRelations>(`/appointments/${id}`),
   createAppointment: (input: CreateAppointmentInput) =>

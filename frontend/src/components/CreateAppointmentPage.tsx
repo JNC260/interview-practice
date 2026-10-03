@@ -2,19 +2,75 @@ import { useState, type FormEvent } from "react";
 import {
   useAdvocates,
   useAppointments,
+  useAppointmentsByAdvocate,
   useCreateAppointment,
   usePatients,
 } from "../lib/hooks";
+import { type AppointmentWithRelations } from "../lib/api";
+
+type AppointmentListProps = {
+  appointments: AppointmentWithRelations[];
+  sortBy: string;
+  sortDir: string;
+  handleSort: (value: string) => void;
+  error?: Error | null;
+};
+const AppointmentList = ({
+  appointments,
+  sortBy,
+  sortDir,
+  handleSort,
+  error,
+}: AppointmentListProps) => {
+  return (
+    <>
+      <h2>Appointments ({appointments.length ?? "…"})</h2>
+      <select
+        value={[sortBy, sortDir]}
+        onChange={(e) => handleSort(e.target.value)}
+      >
+        Sort options
+        <option value={["scheduledAt", "ASC"]}>Date ascending</option>
+        <option value={["scheduledAt", "DESC"]}>Date descending</option>
+        <option value={["status", "ASC"]}>Status ascending</option>
+        <option value={["status", "DESC"]}>Status descending</option>
+      </select>
+      {error && <p>{error.message}</p>}
+      <ul>
+        {appointments.map((a) => (
+          <li key={a.id}>
+            {new Date(a.scheduledAt).toLocaleString()}: {a.patient.fullName}{" "}
+            with {a.advocate.fullName} ({a.status})
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
 
 export const CreateAppointmentPage = () => {
   const patients = usePatients();
   const advocates = useAdvocates();
-  const appointments = useAppointments();
   const createAppointment = useCreateAppointment();
 
   const [patientId, setPatientId] = useState("");
   const [advocateId, setAdvocateId] = useState("");
   const [scheduledAt, setScheduledAt] = useState("");
+  const [sortBy, setSortBy] = useState("scheduledAt");
+  const [sortDir, setSortDir] = useState("DESC");
+
+  const allAppointments = useAppointments();
+
+  const appointmentsByAdvocate = useAppointmentsByAdvocate({
+    advocateId,
+    sortBy,
+    sortDir,
+    enabled: Boolean(advocateId),
+  });
+
+  const visibleAppointments = advocateId
+    ? appointmentsByAdvocate
+    : allAppointments;
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -27,6 +83,12 @@ export const CreateAppointmentPage = () => {
       },
       { onSuccess: () => setScheduledAt("") },
     );
+  }
+
+  function handleSort(value: string) {
+    const [by, dir] = value.split(",");
+    setSortBy(by);
+    setSortDir(dir);
   }
 
   return (
@@ -70,17 +132,13 @@ export const CreateAppointmentPage = () => {
       {createAppointment.error && (
         <p style={{ color: "crimson" }}>{createAppointment.error.message}</p>
       )}
-
-      <h2>Appointments ({appointments.data?.length ?? "…"})</h2>
-      {appointments.error && <p>{appointments.error.message}</p>}
-      <ul>
-        {appointments.data?.map((a) => (
-          <li key={a.id}>
-            {new Date(a.scheduledAt).toLocaleString()}: {a.patient.fullName}{" "}
-            with {a.advocate.fullName} ({a.status})
-          </li>
-        ))}
-      </ul>
+      <AppointmentList
+        appointments={visibleAppointments.data ?? []}
+        sortBy={sortBy}
+        sortDir={sortDir}
+        handleSort={handleSort}
+        error={visibleAppointments.error}
+      />
     </>
   );
 };

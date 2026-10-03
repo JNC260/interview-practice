@@ -8,7 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { Appointment } from './appointment.entity.js';
 import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
-import { AppointmentSortOptions } from './appointments.controller.js';
+import {
+  AppointmentSortField,
+  SortDirection,
+} from './appointments.controller.js';
 
 @Injectable()
 export class AppointmentsService {
@@ -34,42 +37,20 @@ export class AppointmentsService {
     return appointment;
   }
 
-  async findByAdvocate(
-    advocateId: string,
-    sort?: AppointmentSortOptions,
-  ): Promise<Appointment[]> {
-    switch (sort) {
-      case AppointmentSortOptions.DATEASC: {
-        return this.appointmentsRepository.find({
-          where: { advocateId },
-          order: { scheduledAt: 'ASC' },
-        });
-      }
-      case AppointmentSortOptions.DATEDESC: {
-        return this.appointmentsRepository.find({
-          where: { advocateId },
-          order: { scheduledAt: 'DESC' },
-        });
-      }
-      case AppointmentSortOptions.STATUSASC: {
-        return this.appointmentsRepository.find({
-          where: { advocateId },
-          order: { status: 'ASC' },
-        });
-      }
-      case AppointmentSortOptions.STATUSDESC: {
-        return this.appointmentsRepository.find({
-          where: { advocateId },
-          order: { status: 'DESC' },
-        });
-      }
-      default: {
-        return this.appointmentsRepository.find({
-          where: { advocateId },
-          order: { scheduledAt: 'DESC' },
-        });
-      }
-    }
+  async findByAdvocate({
+    advocateId,
+    sortBy = AppointmentSortField.SCHEDULED_AT,
+    sortDir = SortDirection.DESC,
+  }: {
+    advocateId: string;
+    sortBy?: AppointmentSortField;
+    sortDir?: SortDirection;
+  }): Promise<Appointment[]> {
+    return this.appointmentsRepository.find({
+      where: { advocateId },
+      order: { [sortBy]: sortDir },
+      relations: { patient: true, advocate: true },
+    });
   }
   // No check-then-insert: the partial unique index on (advocateId,
   // scheduledAt) is the source of truth, so two concurrent requests for the
