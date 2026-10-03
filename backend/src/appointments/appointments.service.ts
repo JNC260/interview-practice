@@ -5,13 +5,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { QueryFailedError, Repository } from 'typeorm';
+import { QueryFailedError, Repository, In } from 'typeorm';
 import { Appointment } from './appointment.entity.js';
 import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
 import {
   AppointmentSortField,
   SortDirection,
 } from './appointments.controller.js';
+import { AppointmentStatus } from './appointment.entity.js';
 
 @Injectable()
 export class AppointmentsService {
@@ -72,6 +73,47 @@ export class AppointmentsService {
       }
       throw err;
     }
+  }
+
+  async bulkUpdate(
+    ids: string[],
+  ): Promise<{ success: string[]; fail: { id: string; reason: string }[] }> {
+    const result = await this.appointmentsRepository
+      .createQueryBuilder()
+      .update(Appointment)
+      .set({ status: AppointmentStatus.CANCELLED })
+      .where('id IN (:...ids)', { ids })
+      .andWhere('status != :completed', {
+        completed: AppointmentStatus.COMPLETED,
+      })
+      .returning(['id'])
+      .execute();
+
+    const success: string[] = result.raw.map((row: { id: string }) => row.id);
+
+    // Anything in the original list that ISN'T in `succeeded` either didn't
+    // exist, or was already completed. One cheap follow-up query to tell
+    // those two cases apart for the error message, rather than N queries.
+    const failedIds = ids.filter((id) => !success.includes(id));
+    const fail: { id: string; reason: string }[] = [];
+
+    if (failedIds.length > 0) {
+      const foundButNotUpdated = await this.appointmentsRepository.find({
+        where: { id: In(failedIds) },
+        select: { id: true, status: true },
+      });
+      const foundIds = new Set(foundButNotUpdated.map((a) => a.id));
+
+      for (const id of failedIds) {
+        if (!foundIds.has(id)) {
+          fail.push({ id, reason: 'Appointment not found' });
+        } else {
+          fail.push({ id, reason: 'Appointment is already completed' });
+        }
+      }
+    }
+
+    return { success, fail };
   }
 }
 

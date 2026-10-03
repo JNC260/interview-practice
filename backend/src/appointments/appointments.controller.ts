@@ -6,11 +6,16 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
+  Patch,
   ParseEnumPipe,
 } from '@nestjs/common';
 import { AppointmentsService } from './appointments.service.js';
 import { Appointment } from './appointment.entity.js';
 import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
+import {
+  BulkUpdateDto,
+  UpdateAppointmentDto,
+} from './dto/update-appointment.dto.js';
 
 export enum AppointmentSortField {
   SCHEDULED_AT = 'scheduledAt',
@@ -57,5 +62,10 @@ export class AppointmentsController {
   @Post()
   create(@Body() dto: CreateAppointmentDto): Promise<Appointment> {
     return this.appointmentsService.create(dto);
+  }
+
+  @Patch('bulk')
+  bulkUpdate(@Body() dto: BulkUpdateDto): Promise<Appointment[]> {
+    return this.appointmentsService.bulkUpdate(dto);
   }
 }
