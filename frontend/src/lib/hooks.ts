@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 import { api } from "./api";
 import { queryKeys } from "./queryKeys";
 
@@ -6,6 +11,7 @@ export function usePatients(searchTerm?: string) {
   return useQuery({
     queryKey: queryKeys.patients.list(searchTerm),
     queryFn: () => api.listPatients(searchTerm),
+    placeholderData: keepPreviousData,
   });
 }
 
