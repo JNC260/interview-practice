@@ -64,10 +64,10 @@ export class AppointmentsController {
     return this.appointmentsService.create(dto);
   }
 
-  @Patch('bulk')
+  @Patch('bulkAppointmentCancel')
   bulkAppointmentCancel(
     @Body() dto: BulkAppointmentCancelDto,
-  ): Promise<Appointment[]> {
-    return this.appointmentsService.bulkAppointmentCancel(dto);
+  ): Promise<{ success: string[]; fail: { id: string; reason: string }[] }> {
+    return this.appointmentsService.bulkAppointmentCancel(dto.appointmentIds);
   }
 }

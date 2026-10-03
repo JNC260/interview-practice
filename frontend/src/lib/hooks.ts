@@ -62,3 +62,15 @@ export function useCreateAppointment() {
       }),
   });
 }
+
+export function useBulkAppointmentCancel() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: api.bulkAppointmentCancel,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.appointments.list(),
+      });
+    },
+  });
+}

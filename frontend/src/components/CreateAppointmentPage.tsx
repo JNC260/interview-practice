@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, useMemo } from "react";
 import {
   useAdvocates,
   useAppointments,
   useAppointmentsByAdvocate,
+  useBulkAppointmentCancel,
   useCreateAppointment,
   usePatients,
 } from "../lib/hooks";
@@ -22,6 +23,40 @@ const AppointmentList = ({
   handleSort,
   error,
 }: AppointmentListProps) => {
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [failedUpdates, setFailedUpdates] = useState<
+    { id: string; reason: string }[]
+  >([]);
+
+  function toggleSelected(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev); // copy, don't mutate the old Set
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  const bulkCancelAppointments = useBulkAppointmentCancel();
+
+  function handleBulkAppointmentCancel() {
+    const ids = Array.from(selectedIds.values());
+    bulkCancelAppointments.mutate(
+      { appointmentIds: ids },
+      {
+        onSuccess: (result) => {
+          setFailedUpdates(result.fail);
+          setSelectedIds(new Set());
+        },
+      },
+    );
+  }
+  const failMessage = useMemo(() => {
+    return `Update failed for the following appointments: ${failedUpdates.map((u) => `${u.id}: ${u.reason}`)}`;
+  }, [failedUpdates.length]);
   return (
     <>
       <h2>Appointments ({appointments.length ?? "…"})</h2>
@@ -36,12 +71,27 @@ const AppointmentList = ({
         <option value={["status", "DESC"]}>Status descending</option>
       </select>
       {error && <p>{error.message}</p>}
+      <button
+        type="button"
+        disabled={selectedIds.size === 0}
+        onClick={() => handleBulkAppointmentCancel()}
+      >
+        Bulk cancel
+      </button>
+      {failedUpdates.length > 0 && <p>{failMessage}</p>}
       <ul>
         {appointments.map((a) => (
-          <li key={a.id}>
-            {new Date(a.scheduledAt).toLocaleString()}: {a.patient.fullName}{" "}
-            with {a.advocate.fullName} ({a.status})
-          </li>
+          <>
+            <input
+              type="checkbox"
+              checked={selectedIds.has(a.id)}
+              onChange={() => toggleSelected(a.id)}
+            ></input>
+            <li key={a.id}>
+              {new Date(a.scheduledAt).toLocaleString()}: {a.patient.fullName}{" "}
+              with {a.advocate.fullName} ({a.status})
+            </li>
+          </>
         ))}
       </ul>
     </>

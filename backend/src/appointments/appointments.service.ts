@@ -86,7 +86,6 @@ export class AppointmentsService {
       .andWhere('status != :completed', {
         completed: AppointmentStatus.COMPLETED,
       })
-      .returning(['id'])
       .execute();
 
     const success: string[] = result.raw.map((row: { id: string }) => row.id);
