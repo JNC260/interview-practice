@@ -75,7 +75,7 @@ export class AppointmentsService {
     }
   }
 
-  async bulkUpdate(
+  async bulkAppointmentCancel(
     ids: string[],
   ): Promise<{ success: string[]; fail: { id: string; reason: string }[] }> {
     const result = await this.appointmentsRepository

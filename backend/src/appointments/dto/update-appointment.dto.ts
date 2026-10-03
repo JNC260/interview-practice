@@ -4,7 +4,7 @@ import { IsUUID, ArrayNotEmpty, ArrayMaxSize } from 'class-validator';
 
 export class UpdateAppointmentDto extends PartialType(CreateAdvocateDto) {}
 
-export class BulkUpdateDto {
+export class BulkAppointmentCancelDto {
   @IsUUID('4', { each: true })
   @ArrayNotEmpty()
   @ArrayMaxSize(100)

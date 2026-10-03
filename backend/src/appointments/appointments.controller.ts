@@ -13,7 +13,7 @@ import { AppointmentsService } from './appointments.service.js';
 import { Appointment } from './appointment.entity.js';
 import { CreateAppointmentDto } from './dto/create-appointment.dto.js';
 import {
-  BulkUpdateDto,
+  BulkAppointmentCancelDto,
   UpdateAppointmentDto,
 } from './dto/update-appointment.dto.js';
 
@@ -65,7 +65,9 @@ export class AppointmentsController {
   }
 
   @Patch('bulk')
-  bulkUpdate(@Body() dto: BulkUpdateDto): Promise<Appointment[]> {
-    return this.appointmentsService.bulkUpdate(dto);
+  bulkAppointmentCancel(
+    @Body() dto: BulkAppointmentCancelDto,
+  ): Promise<Appointment[]> {
+    return this.appointmentsService.bulkAppointmentCancel(dto);
   }
 }
