@@ -5,6 +5,7 @@ import { AppService } from './app.service.js';
 import { PatientsModule } from './patients/patients.module.js';
 import { AdvocatesModule } from './advocates/advocates.module.js';
 import { AppointmentsModule } from './appointments/appointments.module.js';
+import { AppointmentActivityModule } from './appointment-activity/appointment-activity.module.js';
 import { Patient } from './patients/patient.entity.js';
 import { Advocate } from './advocates/advocate.entity.js';
 import { Appointment } from './appointments/appointment.entity.js';
@@ -23,6 +24,7 @@ import { Appointment } from './appointments/appointment.entity.js';
     PatientsModule,
     AdvocatesModule,
     AppointmentsModule,
+    AppointmentActivityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

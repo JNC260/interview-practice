@@ -1,12 +1,18 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
   type Relation,
 } from 'typeorm';
 import { Appointment } from '../appointments/appointment.entity.js';
+
+export enum PatientStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+}
 
 @Entity('patients')
 export class Patient {
@@ -31,4 +37,14 @@ export class Patient {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+
+  @Column({
+    type: 'simple-enum',
+    enum: PatientStatus,
+    default: PatientStatus.ACTIVE,
+  })
+  status: PatientStatus;
 }

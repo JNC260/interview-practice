@@ -74,3 +74,15 @@ export function useBulkAppointmentCancel() {
     },
   });
 }
+
+export function useDeletePatient() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: api.deletePatient,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.patients.list(),
+      });
+    },
+  });
+}

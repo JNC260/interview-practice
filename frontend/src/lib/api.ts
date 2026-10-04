@@ -96,11 +96,15 @@ function post<T>(path: string, body: unknown): Promise<T> {
   return request<T>(path, { method: "POST", body: JSON.stringify(body) });
 }
 
+function deletePatient(path: string): Promise<string> {
+  return request<string>(path, { method: "DELETE" });
+}
+
 type BulkUpdateResult = {
   success: string[];
   fail: [{ id: string; reason: string }];
 };
-function bulkPatch<T>(
+function bulkPatch(
   path: string,
   body: { appointmentIds: string[] },
 ): Promise<BulkUpdateResult> {
@@ -118,7 +122,7 @@ export const api = {
   getPatient: (id: string) => request<Patient>(`/patients/${id}`),
   createPatient: (input: CreatePatientInput) =>
     post<Patient>("/patients", input),
-
+  deletePatient: (id: string) => deletePatient(`/patients/${id}`),
   listAdvocates: () => request<Advocate[]>("/advocates"),
   getAdvocate: (id: string) => request<Advocate>(`/advocates/${id}`),
   createAdvocate: (input: CreateAdvocateInput) =>
@@ -142,5 +146,5 @@ export const api = {
   createAppointment: (input: CreateAppointmentInput) =>
     post<Appointment>("/appointments", input),
   bulkAppointmentCancel: (input: { appointmentIds: string[] }) =>
-    bulkPatch<Appointment>("/appointments/bulkAppointmentCancel", input),
+    bulkPatch("/appointments/bulkAppointmentCancel", input),
 };

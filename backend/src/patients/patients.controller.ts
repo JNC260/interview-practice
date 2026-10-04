@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -28,5 +29,10 @@ export class PatientsController {
   @Post()
   create(@Body() dto: CreatePatientDto): Promise<Patient> {
     return this.patientsService.create(dto);
+  }
+
+  @Delete(':id')
+  delete(@Param('id', ParseUUIDPipe) id: string): Promise<string> {
+    return this.patientsService.delete(id);
   }
 }
